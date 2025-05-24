@@ -37,5 +37,5 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     target_link_options(common-options INTERFACE ${LIBCXXLinkerOptions})
 endif ()
 
-add_executable(rtiow main.cpp)
+add_executable(rtiow src/main.cpp)
 target_link_libraries(rtiow PRIVATE common-options)
