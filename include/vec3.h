@@ -26,7 +26,7 @@ public:
     return std::move(*this);
   }
 
-  num_t operator[](const int i) const { return e[i]; }
+  num_t  operator[](const int i) const { return e[i]; }
   num_t &operator[](const int i) { return e[i]; }
 
   vec3 &operator+=(const vec3 &t) {

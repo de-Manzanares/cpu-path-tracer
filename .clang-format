@@ -1,2 +1,6 @@
 BasedOnStyle: LLVM
-AllowShortCaseLabelsOnASingleLine: true
+
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveDeclarations: Consecutive
+AllowShortBlocksOnASingleLine: Empty
+InsertNewlineAtEOF: true
