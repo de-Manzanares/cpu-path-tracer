@@ -4,7 +4,6 @@
 #include "rtweekend.h"
 #include <cmath>
 
-
 class Vec3 {
 public:
   num_t e[3];
@@ -49,6 +48,15 @@ public:
   [[nodiscard]] num_t length_squared() const {
     return (e[0] * e[0]) + (e[1] * e[1]) + (e[2] * e[2]);
   }
+
+  [[nodiscard]] static Vec3 random() {
+    return Vec3{random_num_t(), random_num_t(), random_num_t()};
+  }
+
+  [[nodiscard]] static Vec3 random(cnum_t min, cnum_t max) {
+    return Vec3{random_num_t(min, max), random_num_t(min, max),
+                random_num_t(min, max)};
+  }
 };
 
 using cVec3   = const Vec3;
@@ -90,5 +98,23 @@ inline Vec3 cross(cVec3 &u, cVec3 &v) {
 }
 
 inline Vec3 unit_vector(cVec3 &v) { return v / v.length(); }
+
+inline Vec3 random_unit_vector() {
+  while (true) {
+    auto p     = Vec3::random(-1, 1);
+    auto lensq = p.length_squared();
+    if (1e-160 < lensq && lensq <= 1) {
+      return p / sqrt(lensq);
+    }
+  }
+}
+
+inline Vec3 random_on_hemisphere(cVec3 &normal) {
+  Vec3 on_unit_sphere = random_unit_vector();
+  if (dot(on_unit_sphere, normal) > 0.0) { // same hemisphere as normal
+    return on_unit_sphere;
+  }
+  return -std::move(on_unit_sphere);
+}
 
 #endif

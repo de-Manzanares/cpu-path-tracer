@@ -93,7 +93,9 @@ private:
 
   static Color ray_color(cRay &r, cHittableList &world) {
     if (HitRecord rec; world.hit(r, cInterval{0, infty}, rec)) {
-      return 0.5 * (rec.N + cVec3{1, 1, 1});
+      cVec3 direction = random_on_hemisphere(rec.N);
+      // return 0.5 * (rec.N + cVec3{1, 1, 1}); // normal vec color coding
+      return 0.5 * ray_color(Ray{rec.p, direction}, world);
     }
     cVec3      unit_direction = unit_vector(r.direction());
     const auto a              = 0.5 * (unit_direction.y() + 1.0);
