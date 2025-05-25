@@ -101,7 +101,7 @@ private:
     }
 
     if (HitRecord rec; world.hit(r, cInterval{0.001, infty}, rec)) {
-      cVec3 direction = random_on_hemisphere(rec.N);
+      cVec3 direction = rec.N + random_unit_vector();
       // return 0.5 * (rec.N + cVec3{1, 1, 1}); // normal vec color coding
       return 0.5 * ray_color(Ray{rec.p, direction}, depth - 1, world);
     }
