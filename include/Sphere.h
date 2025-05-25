@@ -21,7 +21,7 @@ public:
       return false;
     }
 
-    auto sqrtd = std::sqrt(discriminant);
+    const auto sqrtd = std::sqrt(discriminant);
 
     // Find the nearest root that lies in the acceptable range.
     auto root = (h - sqrtd) / a;
@@ -32,9 +32,12 @@ public:
       }
     }
 
-    rec.t      = root;
-    rec.p      = r.at(rec.t);
-    rec.normal = (rec.p - _center) / _radius;
+    rec.t = root;
+    rec.p = r.at(rec.t);
+    rec.N = (rec.p - _center) / _radius;
+
+    cVec3 outward_normal = (rec.p - _center) / _radius;
+    rec.set_face_normal(r, outward_normal);
 
     return true;
   }

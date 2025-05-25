@@ -5,13 +5,13 @@
 
 struct HitRecord {
   Point3 p;
-  Vec3   normal;
+  Vec3   N;
   num_t  t;
   bool   front_face;
 
   void set_face_normal(cRay &r, cVec3 &outward_normal) {
     front_face = dot(r.direction(), outward_normal) < 0;
-    normal     = front_face ? outward_normal : -outward_normal;
+    N     = front_face ? outward_normal : -outward_normal;
   }
 };
 
