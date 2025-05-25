@@ -1,22 +1,22 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
-#include "hittable.h"
-#include "vec3.h"
+#include "Hittable.h"
+#include "Vec3.h"
 
-class sphere : public Hittable {
+class Sphere : public Hittable {
 public:
-  sphere(cpoint3 &center, cnum_t radius)
+  Sphere(cPoint3 &center, cnum_t radius)
       : _center(center), _radius(std::fmax(0, radius)) {}
 
-  bool hit(const ray &r, cnum_t ray_tmin, cnum_t ray_tmax,
-           Hit_Record &rec) const override {
-    cvec3  oc = _center - r.origin();
+  bool hit(cRay &r, cnum_t ray_tmin, cnum_t ray_tmax,
+           HitRecord &rec) const override {
+    cVec3  oc = _center - r.origin();
     cnum_t a  = r.direction().length_squared();
     cnum_t h  = dot(r.direction(), oc);
     cnum_t c  = oc.length_squared() - _radius * _radius;
 
-    cnum_t discriminant = h * h - a * c;
+    cnum_t discriminant = (h * h) - (a * c);
     if (discriminant < 0) {
       return false;
     }
@@ -40,7 +40,7 @@ public:
   }
 
 private:
-  point3 _center;
+  Point3 _center;
   num_t  _radius;
 };
 

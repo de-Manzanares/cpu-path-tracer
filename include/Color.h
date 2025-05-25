@@ -1,13 +1,13 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-#include "vec3.h"
+#include "Vec3.h"
 
 #include <iostream>
 
-using color = vec3;
+using Color = Vec3;
 
-inline void write_color(std::ostream &os, const color &pixel_color) {
+inline void write_color(std::ostream &os, const Color &pixel_color) {
   const auto r = pixel_color.x();
   const auto g = pixel_color.y();
   const auto b = pixel_color.z();
