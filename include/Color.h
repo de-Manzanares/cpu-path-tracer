@@ -8,10 +8,17 @@
 
 using Color = Vec3;
 
+inline num_t linear_to_gamma(cnum_t linear_component) {
+  if (linear_component > 0) {
+    return std::sqrt(linear_component);
+  }
+  return 0;
+}
+
 inline void write_color(std::ostream &os, const Color &pixel_color) {
-  const auto r = pixel_color.x();
-  const auto g = pixel_color.y();
-  const auto b = pixel_color.z();
+  const auto r = linear_to_gamma(pixel_color.x());
+  const auto g = linear_to_gamma(pixel_color.y());
+  const auto b = linear_to_gamma(pixel_color.z());
 
   static cInterval intensity{0.000, 0.999};
 
