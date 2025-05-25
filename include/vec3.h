@@ -52,42 +52,44 @@ public:
   }
 };
 
-using point3 = vec3;
+using cvec3   = const vec3;
+using point3  = vec3;
+using cpoint3 = const point3;
 
-inline std::ostream &operator<<(std::ostream &os, const vec3 &v) {
+inline std::ostream &operator<<(std::ostream &os, cvec3 &v) {
   return os << v.e[0] << ' ' << v.e[1] << ' ' << v.e[2];
 }
 
-inline vec3 operator+(const vec3 &u, const vec3 &v) {
+inline vec3 operator+(cvec3 &u, cvec3 &v) {
   return vec3{u.e[0] + v.e[0], u.e[1] + v.e[1], u.e[2] + v.e[2]};
 }
 
-inline vec3 operator-(const vec3 &u, const vec3 &v) {
+inline vec3 operator-(cvec3 &u, cvec3 &v) {
   return vec3{u.e[0] - v.e[0], u.e[1] - v.e[1], u.e[2] - v.e[2]};
 }
 
-inline vec3 operator*(const vec3 &u, const vec3 &v) {
+inline vec3 operator*(cvec3 &u, cvec3 &v) {
   return vec3{u.e[0] * v.e[0], u.e[1] * v.e[1], u.e[2] * v.e[2]};
 }
 
-inline vec3 operator*(cnum_t t, const vec3 &v) {
+inline vec3 operator*(cnum_t t, cvec3 &v) {
   return vec3{t * v.e[0], t * v.e[1], t * v.e[2]};
 }
 
-inline vec3 operator*(const vec3 &v, cnum_t t) { return t * v; }
+inline vec3 operator*(cvec3 &v, cnum_t t) { return t * v; }
 
-inline vec3 operator/(const vec3 &v, cnum_t t) { return 1 / t * v; }
+inline vec3 operator/(cvec3 &v, cnum_t t) { return 1 / t * v; }
 
-inline num_t dot(const vec3 &u, const vec3 &v) {
+inline num_t dot(cvec3 &u, cvec3 &v) {
   return u.e[0] * v.e[0] + u.e[1] * v.e[1] + u.e[2] * v.e[2];
 }
 
-inline vec3 cross(const vec3 &u, const vec3 &v) {
+inline vec3 cross(cvec3 &u, cvec3 &v) {
   return vec3{u.e[1] * v.e[2] - u.e[2] * v.e[1],
               u.e[2] * v.e[0] - u.e[0] * v.e[2],
               u.e[0] * v.e[1] - u.e[1] * v.e[0]};
 }
 
-inline vec3 unit_vector(const vec3 &v) { return v / v.length(); }
+inline vec3 unit_vector(cvec3 &v) { return v / v.length(); }
 
 #endif

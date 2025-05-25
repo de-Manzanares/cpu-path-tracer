@@ -2,23 +2,33 @@
 
 #include "../include/color.h"
 #include "../include/ray.h"
+#include "../include/sphere.h"
 #include "../include/vec3.h"
 
-bool hit_sphere(const point3 &center, cnum_t radius, const ray &r) {
-  const vec3 oc           = center - r.origin();
-  const auto a            = dot(r.direction(), r.direction());
-  const auto b            = -2.0 * dot(r.direction(), oc);
-  const auto c            = dot(oc, oc) - radius * radius;
-  const auto discriminant = b * b - 4 * a * c;
-  return (discriminant >= 0);
+num_t hit_sphere(cpoint3 &center, cnum_t radius, const ray &r) {
+  cvec3  oc = center - r.origin();
+  cnum_t a  = r.direction().length_squared();
+  cnum_t h  = dot(r.direction(), oc);
+  cnum_t c  = oc.length_squared() - (radius * radius);
+
+  cnum_t discriminant = (h * h) - (a * c);
+  if (discriminant < 0) {
+    return -1.0;
+  }
+  return (h - std::sqrt(discriminant)) / a;
 }
 
 color ray_color(const ray &r) {
-  if (hit_sphere(point3(0, 0, -1), 0.5, r)) {
-    return color(1, 0, 0);
+  if (cnum_t t = hit_sphere(point3(0, 0, -1), 0.5, r); t > 0) {
+    cvec3 N = r.at(t) - vec3{0, 0, -1};
+    // f(x)=(x+1)/2 maps [-1,1] to [0,1]
+    return 0.5 * color{N.x() + 1, N.y() + 1, N.z() + 1};
   }
-  const vec3 unit_direction = unit_vector(r.direction());
+
+  cvec3      unit_direction = unit_vector(r.direction());
   const auto a              = 0.5 * (unit_direction.y() + 1.0);
+
+  // blue to orange linear interpolation -- horizontal and vertical gradient
   return (1.0 - a) * color{253.0 / 255.0, 94.0 / 255.0, 83.0 / 255.0} +
          a * color{55.0 / 255.0, 198.0 / 255.0, 255.0 / 255.0};
 }
@@ -28,7 +38,7 @@ int main() {
   // image
 
   constexpr num_t aspect_ratio = 16.0 / 9.0;
-  constexpr num_t image_width  = 2560;
+  constexpr num_t image_width  = 720;
 
   constexpr num_t image_height =
       image_width / aspect_ratio < 1
