@@ -54,8 +54,9 @@ public:
   }
 
   [[nodiscard]] static Vec3 random(cnum_t min, cnum_t max) {
-    return Vec3{random_num_t(min, max), random_num_t(min, max),
-                random_num_t(min, max)};
+    return Vec3{
+        random_num_t(min, max), random_num_t(min, max), random_num_t(min, max)
+    };
   }
 };
 
@@ -92,9 +93,11 @@ inline num_t dot(cVec3 &u, cVec3 &v) {
 }
 
 inline Vec3 cross(cVec3 &u, cVec3 &v) {
-  return Vec3{(u.e[1] * v.e[2]) - (u.e[2] * v.e[1]),
-              (u.e[2] * v.e[0]) - (u.e[0] * v.e[2]),
-              (u.e[0] * v.e[1]) - (u.e[1] * v.e[0])};
+  return Vec3{
+      (u.e[1] * v.e[2]) - (u.e[2] * v.e[1]),
+      (u.e[2] * v.e[0]) - (u.e[0] * v.e[2]),
+      (u.e[0] * v.e[1]) - (u.e[1] * v.e[0])
+  };
 }
 
 inline Vec3 unit_vector(cVec3 &v) { return v / v.length(); }
