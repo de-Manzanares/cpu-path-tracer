@@ -53,7 +53,8 @@ int main() {
   CameraConfig config = {
       .aspect_ratio      = 16.0 / 9.0,
       .image_width       = resolutions["qHD"],
-      .samples_per_pixel = 20,
+      .samples_per_pixel = 100,
+      .max_depth         = 50,
   };
 
   Camera cam(config);

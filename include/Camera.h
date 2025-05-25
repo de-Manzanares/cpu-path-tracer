@@ -12,11 +12,12 @@ struct CameraConfig {
   cnum_t    aspect_ratio;
   const int image_width;
   const int samples_per_pixel;
+  const int max_depth;
 };
 
 class Camera {
 public:
-  Camera(const CameraConfig config) {
+  Camera(const CameraConfig &config) {
 
     // image
 
@@ -24,6 +25,7 @@ public:
     _image_width        = config.image_width;
     _samples_per_pixel  = config.samples_per_pixel;
     _pixel_sample_scale = 1.0 / _samples_per_pixel;
+    _max_depth          = config.max_depth;
 
     _image_height = _image_width / _aspect_ratio < 1
                         ? 1
@@ -65,13 +67,14 @@ public:
           auto pixel_center =
               _pixel00_loc + (i * _pixel_delta_u) + (j * _pixel_delta_v);
           auto  ray_direction = pixel_center - _center;
-          Color pixel_color   = ray_color(Ray{_center, ray_direction}, world);
+          Color pixel_color =
+              ray_color(Ray{_center, ray_direction}, _max_depth, world);
           write_color(std::cout, pixel_color);
         } else {
           auto pixel_color = Color{0, 0, 0};
           for (int sample = 0; sample < _samples_per_pixel; sample++) {
             Ray r        = get_ray(i, j);
-            pixel_color += ray_color(r, world);
+            pixel_color += ray_color(r, _max_depth, world);
           }
           write_color(std::cout, _pixel_sample_scale * pixel_color);
         }
@@ -85,17 +88,22 @@ private:
   int    _image_width;        // Rendered image width in pixel count
   int    _image_height;       // Rendered image height
   int    _samples_per_pixel;  // Count of random samples for each pixel
+  int    _max_depth;          // Limit the number of reflections per ray
   num_t  _pixel_sample_scale; // Color scale factor for a sum of pixel samples
   Point3 _center;             // Camera center
   Point3 _pixel00_loc;        // Location of pixel 0, 0
   Vec3   _pixel_delta_u;      // Offset to pixel to the right
   Vec3   _pixel_delta_v;      // Offset to pixel below
 
-  static Color ray_color(cRay &r, cHittableList &world) {
-    if (HitRecord rec; world.hit(r, cInterval{0, infty}, rec)) {
+  static Color ray_color(cRay &r, const int depth, cHittableList &world) {
+    if (depth <= 0) {
+      return Color{0, 0, 0};
+    }
+
+    if (HitRecord rec; world.hit(r, cInterval{0.001, infty}, rec)) {
       cVec3 direction = random_on_hemisphere(rec.N);
       // return 0.5 * (rec.N + cVec3{1, 1, 1}); // normal vec color coding
-      return 0.5 * ray_color(Ray{rec.p, direction}, world);
+      return 0.5 * ray_color(Ray{rec.p, direction}, depth - 1, world);
     }
     cVec3      unit_direction = unit_vector(r.direction());
     const auto a              = 0.5 * (unit_direction.y() + 1.0);
