@@ -1,10 +1,9 @@
 #ifndef VEC3_H
 #define VEC3_H
 
+#include "rtweekend.h"
 #include <cmath>
 
-using num_t  = double;
-using cnum_t = const num_t;
 
 class Vec3 {
 public:

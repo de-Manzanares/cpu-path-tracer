@@ -3,14 +3,14 @@
 
 #include "Hittable.h"
 #include "Vec3.h"
+#include <cmath>
 
 class Sphere : public Hittable {
 public:
   Sphere(cPoint3 &center, cnum_t radius)
       : _center(center), _radius(std::fmax(0, radius)) {}
 
-  bool hit(cRay &r, cnum_t ray_tmin, cnum_t ray_tmax,
-           HitRecord &rec) const override {
+  bool hit(cRay &r, cInterval ray_t, HitRecord &rec) const override {
     cVec3  oc = _center - r.origin();
     cnum_t a  = r.direction().length_squared();
     cnum_t h  = dot(r.direction(), oc);
@@ -25,9 +25,9 @@ public:
 
     // Find the nearest root that lies in the acceptable range.
     auto root = (h - sqrtd) / a;
-    if (root <= ray_tmin || ray_tmax <= root) {
+    if (!ray_t.surrounds(root)) {
       root = (h + sqrtd) / a;
-      if (root <= ray_tmin || ray_tmax <= root) {
+      if (!ray_t.surrounds(root)) {
         return false;
       }
     }

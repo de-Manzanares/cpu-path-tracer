@@ -1,6 +1,11 @@
 #ifndef RTWEEKEND_H
 #define RTWEEKEND_H
 
+#include <limits>
+
+using num_t  = double;
+using cnum_t = const num_t;
+
 constexpr num_t infty = std::numeric_limits<num_t>::infinity();
 constexpr num_t pi    = 3.141592653589793;
 
