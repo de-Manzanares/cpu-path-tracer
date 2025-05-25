@@ -8,14 +8,22 @@
 
 #include <iostream>
 
+struct CameraConfig {
+  cnum_t    aspect_ratio;
+  const int image_width;
+  const int samples_per_pixel;
+};
+
 class Camera {
 public:
-  Camera(cnum_t aspect_ratio = 16.0 / 9.0, const int image_width = 960) {
+  Camera(const CameraConfig config) {
 
     // image
 
-    _aspect_ratio = aspect_ratio;
-    _image_width  = image_width;
+    _aspect_ratio       = config.aspect_ratio;
+    _image_width        = config.image_width;
+    _samples_per_pixel  = config.samples_per_pixel;
+    _pixel_sample_scale = 1.0 / _samples_per_pixel;
 
     _image_height = _image_width / _aspect_ratio < 1
                         ? 1
@@ -53,24 +61,35 @@ public:
       std::clog << "\rScanlines remaining: " << (_image_height - j)
                 << std::flush;
       for (int i = 0; i < _image_width; i++) {
-        auto pixel_center =
-            _pixel00_loc + (i * _pixel_delta_u) + (j * _pixel_delta_v);
-        auto  ray_direction = pixel_center - _center;
-        Color pixel_color   = ray_color(Ray{_center, ray_direction}, world);
-        write_color(std::cout, pixel_color);
+        if (_samples_per_pixel == 1) {
+          auto pixel_center =
+              _pixel00_loc + (i * _pixel_delta_u) + (j * _pixel_delta_v);
+          auto  ray_direction = pixel_center - _center;
+          Color pixel_color   = ray_color(Ray{_center, ray_direction}, world);
+          write_color(std::cout, pixel_color);
+        } else {
+          auto pixel_color = Color{0, 0, 0};
+          for (int sample = 0; sample < _samples_per_pixel; sample++) {
+            Ray r        = get_ray(i, j);
+            pixel_color += ray_color(r, world);
+          }
+          write_color(std::cout, _pixel_sample_scale * pixel_color);
+        }
       }
     }
     std::clog << "\rDone.                                                   \n";
   }
 
 private:
-  num_t  _aspect_ratio;  // Ratio of image width over height
-  int    _image_width;   // Rendered image width in pixel count
-  int    _image_height;  // Rendered image height
-  Point3 _center;        // Camera center
-  Point3 _pixel00_loc;   // Location of pixel 0, 0
-  Vec3   _pixel_delta_u; // Offset to pixel to the right
-  Vec3   _pixel_delta_v; // Offset to pixel below
+  num_t  _aspect_ratio;       // Ratio of image width over height
+  int    _image_width;        // Rendered image width in pixel count
+  int    _image_height;       // Rendered image height
+  int    _samples_per_pixel;  // Count of random samples for each pixel
+  num_t  _pixel_sample_scale; // Color scale factor for a sum of pixel samples
+  Point3 _center;             // Camera center
+  Point3 _pixel00_loc;        // Location of pixel 0, 0
+  Vec3   _pixel_delta_u;      // Offset to pixel to the right
+  Vec3   _pixel_delta_v;      // Offset to pixel below
 
   static Color ray_color(cRay &r, cHittableList &world) {
     if (HitRecord rec; world.hit(r, cInterval{0, infty}, rec)) {
@@ -81,6 +100,21 @@ private:
     // blue to orange linear interpolation -- horizontal and vertical gradient
     return (1.0 - a) * Color{253.0 / 255.0, 94.0 / 255.0, 83.0 / 255.0} +
            a * Color{55.0 / 255.0, 198.0 / 255.0, 1.0};
+  }
+
+  Ray get_ray(const int i, const int j) const {
+    cVec3   offset       = sample_square();
+    cPoint3 pixel_sample = _pixel00_loc + ((i + offset.x()) * _pixel_delta_u) +
+                           ((j + offset.y()) * _pixel_delta_v);
+
+    cPoint3 ray_origin    = _center;
+    cVec3   ray_direction = pixel_sample - ray_origin;
+
+    return Ray{ray_origin, ray_direction};
+  }
+
+  static Vec3 sample_square() {
+    return Vec3{random_num_t() - 0.5, random_num_t() - 0.5, 0};
   }
 };
 
