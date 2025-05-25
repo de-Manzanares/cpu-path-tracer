@@ -4,7 +4,19 @@
 #include "../include/ray.h"
 #include "../include/vec3.h"
 
+bool hit_sphere(const point3 &center, cnum_t radius, const ray &r) {
+  const vec3 oc           = center - r.origin();
+  const auto a            = dot(r.direction(), r.direction());
+  const auto b            = -2.0 * dot(r.direction(), oc);
+  const auto c            = dot(oc, oc) - radius * radius;
+  const auto discriminant = b * b - 4 * a * c;
+  return (discriminant >= 0);
+}
+
 color ray_color(const ray &r) {
+  if (hit_sphere(point3(0, 0, -1), 0.5, r)) {
+    return color(1, 0, 0);
+  }
   const vec3 unit_direction = unit_vector(r.direction());
   const auto a              = 0.5 * (unit_direction.y() + 1.0);
   return (1.0 - a) * color{253.0 / 255.0, 94.0 / 255.0, 83.0 / 255.0} +
