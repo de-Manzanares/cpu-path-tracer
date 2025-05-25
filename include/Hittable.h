@@ -23,4 +23,6 @@ public:
   virtual bool hit(cRay &r, cInterval ray_t, HitRecord &rec) const = 0;
 };
 
+using cHittable = const Hittable;
+
 #endif

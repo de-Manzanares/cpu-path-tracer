@@ -34,4 +34,6 @@ struct HittableList : Hittable {
   }
 };
 
+using cHittableList = const HittableList;
+
 #endif
