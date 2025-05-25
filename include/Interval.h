@@ -14,6 +14,16 @@ struct Interval {
   bool  contains(cnum_t x) const { return _min <= x && x <= _max; }
   bool  surrounds(cnum_t x) const { return _min < x && x < _max; }
 
+  num_t clamp(cnum_t x) const {
+    if (x < _min) {
+      return _min;
+    }
+    if (x > _max) {
+      return _max;
+    }
+    return x;
+  }
+
   static const Interval empty;
   static const Interval universe;
 };
