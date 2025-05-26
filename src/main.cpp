@@ -53,7 +53,7 @@ int main() {
 
   CameraConfig config = {
       .aspect_ratio      = 16.0 / 9.0,
-      .image_width       = resolutions["qHD"],
+      .image_width       = resolutions["HD"],
       .samples_per_pixel = 100,
       .max_depth         = 50,
   };
@@ -65,12 +65,15 @@ int main() {
   auto material_ground = std::make_shared<Lambertian>(Color{0.8, 0.8, 0.0});
   auto material_center = std::make_shared<Lambertian>(Color{0.1, 0.2, 0.5});
   auto material_left   = std::make_shared<Metal>(Color{0.8, 0.8, 0.8}, 0);
-  auto material_right  = std::make_shared<Dielectric>(1.0 / 1.33);
+  auto material_bubble = std::make_shared<Dielectric>(1.0 / 1.5);
+  auto material_glass  = std::make_shared<Dielectric>(1.5);
 
   world.add(std::make_shared<Sphere>(Point3{0.0, -100.5, -1.0}, 100.0, material_ground));
   world.add(std::make_shared<Sphere>(Point3{0.0, 0.0, -1.2}, 0.5, material_center));
   world.add(std::make_shared<Sphere>(Point3{-1.0, 0.0, -1.0}, 0.5, material_left));
-  world.add(std::make_shared<Sphere>(Point3{1.0, 0.0, -1.0}, 0.5, material_right));
+
+  world.add(std::make_shared<Sphere>(Point3{1.0, 0.0, -1.0}, 0.5, material_glass));
+  world.add(std::make_shared<Sphere>(Point3{1.0, 0.0, -1.0}, 0.45, material_bubble));
 
   world.add(std::make_shared<Sphere>(Point3{-1.0, 0.0, 2.0}, 0.5, material_center));
   world.add(std::make_shared<Sphere>(Point3{1.0, 0.0, 2.0}, 0.5, material_center));

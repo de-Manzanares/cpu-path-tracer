@@ -65,7 +65,9 @@ public:
     const bool cannot_refract = ri * sin_theta > 1.0;
     Vec3       direction;
 
-    if (cannot_refract) {
+    // compare reflectance to random n to coin flip on reflection or refraction
+    // instead of always spawning both rays
+    if (cannot_refract || reflectance(cos_theta, ri) > random_num_t()) {
       direction = reflect(unit_direction, rec.N);
     } else {
       direction = refract(unit_direction, rec.N, ri);
@@ -77,6 +79,13 @@ public:
 
 private:
   num_t _ri; // refractive index
+
+  static num_t reflectance(cnum_t cosine, cnum_t refraction_index) {
+    // Schlick's approximation
+    num_t r0 = (1 - refraction_index) / (1 + refraction_index);
+    r0       = r0 * r0;
+    return r0 + ((1 - r0) * std::pow((1 - cosine), 5));
+  }
 };
 
 #endif
