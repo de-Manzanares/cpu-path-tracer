@@ -12,9 +12,7 @@ struct HittableList : Hittable {
   HittableList() = default;
   HittableList(const std::shared_ptr<Hittable> &object) { add(object); }
 
-  void add(const std::shared_ptr<Hittable> &object) {
-    objects.push_back(object);
-  }
+  void add(const std::shared_ptr<Hittable> &object) { objects.push_back(object); }
 
   void clear() { objects.clear(); }
 

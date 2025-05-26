@@ -7,8 +7,7 @@ class Ray {
 public:
   Ray() {}
 
-  Ray(cPoint3 &origin, cVec3 &direction)
-      : _origin{origin}, _direction{direction} {}
+  Ray(cPoint3 &origin, cVec3 &direction) : _origin{origin}, _direction{direction} {}
 
   [[nodiscard]] cPoint3 &origin() const { return _origin; }
   [[nodiscard]] cVec3   &direction() const { return _direction; }

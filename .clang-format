@@ -1,6 +1,13 @@
 BasedOnStyle: LLVM
 
-AlignConsecutiveAssignments: Consecutive
+AlignAfterOpenBracket: BlockIndent
+AllowAllArgumentsOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AlignArrayOfStructures: Left
+AlignConsecutiveAssignments:
+  Enabled: true
+  AlignCompound: true
 AlignConsecutiveDeclarations: Consecutive
 AllowShortBlocksOnASingleLine: Empty
+ColumnLimit: 100
 InsertNewlineAtEOF: true

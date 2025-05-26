@@ -10,10 +10,10 @@
 #include <iostream>
 
 struct CameraConfig {
-  cnum_t    aspect_ratio;
-  const int image_width;
-  const int samples_per_pixel;
-  const int max_depth;
+  num_t aspect_ratio;
+  int   image_width;
+  int   samples_per_pixel;
+  int   max_depth;
 };
 
 class Camera {
@@ -28,17 +28,15 @@ public:
     _pixel_sample_scale = 1.0 / _samples_per_pixel;
     _max_depth          = config.max_depth;
 
-    _image_height = _image_width / _aspect_ratio < 1
-                        ? 1
-                        : static_cast<int>(_image_width / _aspect_ratio);
+    _image_height =
+        _image_width / _aspect_ratio < 1 ? 1 : static_cast<int>(_image_width / _aspect_ratio);
 
     // camera
 
-    _center                         = Point3{0, 0, 1};
+    _camera_center                  = Point3{0, 0, 1};
     constexpr num_t focal_length    = 1.0;
     constexpr num_t viewport_height = 2.0;
-    cnum_t          viewport_width =
-        viewport_height * (static_cast<num_t>(_image_width) / _image_height);
+    cnum_t viewport_width = viewport_height * (static_cast<num_t>(_image_width) / _image_height);
 
     // horizontal and vertical viewport edges
 
@@ -53,23 +51,22 @@ public:
     // location of upper left pixel
 
     const auto viewport_upper_left =
-        _center - Vec3{0, 0, focal_length} - viewport_u / 2 - viewport_v / 2;
-    _pixel00_loc =
-        viewport_upper_left + 0.5 * (_pixel_delta_u + _pixel_delta_v);
+        _camera_center - Vec3{0, 0, focal_length} - viewport_u / 2 - viewport_v / 2;
+    _pixel00_loc = viewport_upper_left + 0.5 * (_pixel_delta_u + _pixel_delta_v);
   }
 
   void render(cHittableList &world) const {
     std::cout << "P3\n" << _image_width << " " << _image_height << "\n255\n";
     for (int j = 0; j < _image_height; j++) {
-      std::clog << "\rScanlines remaining: " << (_image_height - j)
-                << std::flush;
+      if ((_image_height - j) % 100 == 0) {
+        std::clog << "\r                                            " << std::flush;
+        std::clog << "\rScanlines remaining: " << (_image_height - j) << std::flush;
+      }
       for (int i = 0; i < _image_width; i++) {
         if (_samples_per_pixel == 1) {
-          auto pixel_center =
-              _pixel00_loc + (i * _pixel_delta_u) + (j * _pixel_delta_v);
-          auto  ray_direction = pixel_center - _center;
-          Color pixel_color =
-              ray_color(Ray{_center, ray_direction}, _max_depth, world);
+          auto  pixel_center  = _pixel00_loc + (i * _pixel_delta_u) + (j * _pixel_delta_v);
+          auto  ray_direction = pixel_center - _camera_center;
+          Color pixel_color   = ray_color(Ray{_camera_center, ray_direction}, _max_depth, world);
           write_color(std::cout, pixel_color);
         } else {
           auto pixel_color = Color{0, 0, 0};
@@ -91,7 +88,7 @@ private:
   int    _samples_per_pixel;  // Count of random samples for each pixel
   int    _max_depth;          // Limit the number of reflections per ray
   num_t  _pixel_sample_scale; // Color scale factor for a sum of pixel samples
-  Point3 _center;             // Camera center
+  Point3 _camera_center;      // Camera center
   Point3 _pixel00_loc;        // Location of pixel 0, 0
   Vec3   _pixel_delta_u;      // Offset to pixel to the right
   Vec3   _pixel_delta_v;      // Offset to pixel below
@@ -121,19 +118,16 @@ private:
   }
 
   Ray get_ray(const int i, const int j) const {
-    cVec3   offset       = sample_square();
-    cPoint3 pixel_sample = _pixel00_loc + ((i + offset.x()) * _pixel_delta_u) +
-                           ((j + offset.y()) * _pixel_delta_v);
-
-    cPoint3 ray_origin    = _center;
+    cVec3   offset = sample_square();
+    cPoint3 pixel_sample =
+        _pixel00_loc + ((i + offset.x()) * _pixel_delta_u) + ((j + offset.y()) * _pixel_delta_v);
+    cPoint3 ray_origin    = _camera_center;
     cVec3   ray_direction = pixel_sample - ray_origin;
 
     return Ray{ray_origin, ray_direction};
   }
 
-  static Vec3 sample_square() {
-    return Vec3{random_num_t() - 0.5, random_num_t() - 0.5, 0};
-  }
+  static Vec3 sample_square() { return Vec3{random_num_t() - 0.5, random_num_t() - 0.5, 0}; }
 };
 
 #endif

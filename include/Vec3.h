@@ -51,8 +51,7 @@ public:
 
   [[nodiscard]] bool near_zero() const {
     constexpr cnum_t s = 1e-8;
-    return (std::fabs(e[0]) < s) && (std::fabs(e[1]) < s) &&
-           (std::fabs(e[2]) < s);
+    return (std::fabs(e[0]) < s) && (std::fabs(e[1]) < s) && (std::fabs(e[2]) < s);
   }
 
   [[nodiscard]] static Vec3 random() {
@@ -60,9 +59,7 @@ public:
   }
 
   [[nodiscard]] static Vec3 random(cnum_t min, cnum_t max) {
-    return Vec3{
-        random_num_t(min, max), random_num_t(min, max), random_num_t(min, max)
-    };
+    return Vec3{random_num_t(min, max), random_num_t(min, max), random_num_t(min, max)};
   }
 };
 
@@ -86,9 +83,7 @@ inline Vec3 operator*(cVec3 &u, cVec3 &v) {
   return Vec3{u.e[0] * v.e[0], u.e[1] * v.e[1], u.e[2] * v.e[2]};
 }
 
-inline Vec3 operator*(cnum_t t, cVec3 &v) {
-  return Vec3{t * v.e[0], t * v.e[1], t * v.e[2]};
-}
+inline Vec3 operator*(cnum_t t, cVec3 &v) { return Vec3{t * v.e[0], t * v.e[1], t * v.e[2]}; }
 
 inline Vec3 operator*(cVec3 &v, cnum_t t) { return t * v; }
 
@@ -100,8 +95,7 @@ inline num_t dot(cVec3 &u, cVec3 &v) {
 
 inline Vec3 cross(cVec3 &u, cVec3 &v) {
   return Vec3{
-      (u.e[1] * v.e[2]) - (u.e[2] * v.e[1]),
-      (u.e[2] * v.e[0]) - (u.e[0] * v.e[2]),
+      (u.e[1] * v.e[2]) - (u.e[2] * v.e[1]), (u.e[2] * v.e[0]) - (u.e[0] * v.e[2]),
       (u.e[0] * v.e[1]) - (u.e[1] * v.e[0])
   };
 }
