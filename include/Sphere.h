@@ -4,11 +4,13 @@
 #include "Hittable.h"
 #include "Vec3.h"
 #include <cmath>
+#include <utility>
 
 class Sphere : public Hittable {
 public:
-  Sphere(cPoint3 &center, cnum_t radius)
-      : _center(center), _radius(std::fmax(0, radius)) {}
+  Sphere(cPoint3 &center, cnum_t radius, spMaterial material)
+      : _center(center), _radius(std::fmax(0, radius)),
+        _material(std::move(material)) {}
 
   bool hit(cRay &r, cInterval ray_t, HitRecord &rec) const override {
     cVec3  oc = _center - r.origin();
@@ -32,9 +34,10 @@ public:
       }
     }
 
-    rec.t = root;
-    rec.p = r.at(rec.t);
-    rec.N = (rec.p - _center) / _radius;
+    rec.t   = root;
+    rec.p   = r.at(rec.t);
+    rec.N   = (rec.p - _center) / _radius;
+    rec.mat = _material;
 
     cVec3 outward_normal = (rec.p - _center) / _radius;
     rec.set_face_normal(r, outward_normal);
@@ -43,8 +46,9 @@ public:
   }
 
 private:
-  Point3 _center;
-  num_t  _radius;
+  Point3     _center;
+  num_t      _radius;
+  spMaterial _material;
 };
 
 #endif

@@ -49,6 +49,12 @@ public:
     return (e[0] * e[0]) + (e[1] * e[1]) + (e[2] * e[2]);
   }
 
+  [[nodiscard]] bool near_zero() const {
+    constexpr cnum_t s = 1e-8;
+    return (std::fabs(e[0]) < s) && (std::fabs(e[1]) < s) &&
+           (std::fabs(e[2]) < s);
+  }
+
   [[nodiscard]] static Vec3 random() {
     return Vec3{random_num_t(), random_num_t(), random_num_t()};
   }
@@ -119,5 +125,7 @@ inline Vec3 random_on_hemisphere(cVec3 &normal) {
   }
   return -std::move(on_unit_sphere);
 }
+
+inline Vec3 reflect(cVec3 &v, cVec3 &N) { return v - 2 * dot(v, N) * N; }
 
 #endif

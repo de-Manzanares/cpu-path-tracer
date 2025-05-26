@@ -4,6 +4,7 @@
 #include "Color.h"
 #include "Hittable.h"
 #include "HittableList.h"
+#include "Material.h"
 #include "rtweekend.h"
 
 #include <iostream>
@@ -33,7 +34,7 @@ public:
 
     // camera
 
-    _center                         = Point3{0, 0, 0};
+    _center                         = Point3{0, 0, 1};
     constexpr num_t focal_length    = 1.0;
     constexpr num_t viewport_height = 2.0;
     cnum_t          viewport_width =
@@ -101,9 +102,16 @@ private:
     }
 
     if (HitRecord rec; world.hit(r, cInterval{0.001, infty}, rec)) {
-      cVec3 direction = rec.N + random_unit_vector();
       // return 0.5 * (rec.N + cVec3{1, 1, 1}); // normal vec color coding
-      return 0.5 * ray_color(Ray{rec.p, direction}, depth - 1, world);
+      // grey
+      //  cVec3 direction = rec.N + random_unit_vector();
+      // return 0.5 * ray_color(Ray{rec.p, direction}, depth - 1, world);
+      Ray   scattered;
+      Color attenuation;
+      if (rec.mat->scatter(r, rec, attenuation, scattered)) {
+        return attenuation * ray_color(scattered, depth - 1, world);
+      }
+      return Color{0, 0, 0};
     }
     cVec3      unit_direction = unit_vector(r.direction());
     const auto a              = 0.5 * (unit_direction.y() + 1.0);

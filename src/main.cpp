@@ -5,12 +5,13 @@
 #include "../include/Color.h"
 #include "../include/HittableList.h"
 #include "../include/Interval.h"
+#include "../include/Material.h"
 #include "../include/Ray.h"
 #include "../include/Sphere.h"
 #include "../include/Vec3.h"
 #include "../include/rtweekend.h"
 
-num_t hit_sphere(cPoint3 &center, cnum_t radius, cRay &r) {
+num_t hit_Sphere(cPoint3 &center, cnum_t radius, cRay &r) {
   cVec3  oc = center - r.origin();
   cnum_t a  = r.direction().length_squared();
   cnum_t h  = dot(r.direction(), oc);
@@ -59,11 +60,27 @@ int main() {
 
   Camera cam(config);
 
-  // world
-
   HittableList world;
-  world.add(std::make_shared<Sphere>(cPoint3{0, 0, -1}, 0.5));
-  world.add(std::make_shared<Sphere>(cPoint3(0, -100.5, -1), 100));
+
+  auto material_ground = std::make_shared<Lambertian>(Color{0.8, 0.8, 0.0});
+  auto material_center = std::make_shared<Lambertian>(Color{0.1, 0.2, 0.5});
+  auto material_left   = std::make_shared<Metal>(Color{0.8, 0.8, 0.8});
+  auto material_right  = std::make_shared<Metal>(Color{0.8, 0.6, 0.2});
+
+  world.add(
+      std::make_shared<Sphere>(
+          Point3{0.0, -100.5, -1.0}, 100.0, material_ground
+      )
+  );
+  world.add(
+      std::make_shared<Sphere>(Point3{0.0, 0.0, -1.2}, 0.5, material_center)
+  );
+  world.add(
+      std::make_shared<Sphere>(Point3{-1.0, 0.0, -1.0}, 0.5, material_left)
+  );
+  world.add(
+      std::make_shared<Sphere>(Point3{1.0, 0.0, -1.0}, 0.5, material_right)
+  );
 
   // render
 
