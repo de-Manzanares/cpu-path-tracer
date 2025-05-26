@@ -57,13 +57,21 @@ public:
 
   bool
   scatter(cRay &r_in, const HitRecord &rec, Color &attenuation, Ray &scattered) const override {
-    attenuation = Color(1.0, 1.0, 1.0);
-    cnum_t ri   = rec.front_face ? (1.0 / _ri) : _ri; // 1.0 is ri of air
+    attenuation               = Color{1.0, 1.0, 1.0};
+    cnum_t     ri             = rec.front_face ? (1.0 / _ri) : _ri; // 1.0 is ri of air
+    cVec3      unit_direction = unit_vector(r_in.direction());
+    cnum_t     cos_theta      = std::fmin(dot(-unit_direction, rec.N), 1.0);
+    cnum_t     sin_theta      = std::sqrt(1.0 - (cos_theta * cos_theta));
+    const bool cannot_refract = ri * sin_theta > 1.0;
+    Vec3       direction;
 
-    cVec3 unit_direction = unit_vector(r_in.direction());
-    cVec3 refracted      = refract(unit_direction, rec.N, ri);
+    if (cannot_refract) {
+      direction = reflect(unit_direction, rec.N);
+    } else {
+      direction = refract(unit_direction, rec.N, ri);
+    }
 
-    scattered = Ray{rec.p, refracted};
+    scattered = Ray{rec.p, direction};
     return true;
   }
 
