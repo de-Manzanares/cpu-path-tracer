@@ -122,4 +122,11 @@ inline Vec3 random_on_hemisphere(cVec3 &normal) {
 
 inline Vec3 reflect(cVec3 &v, cVec3 &N) { return v - 2 * dot(v, N) * N; }
 
+inline Vec3 refract(cVec3 &uv, cVec3 &n, cnum_t etai_over_etat) {
+  cnum_t cos_theta      = std::fmin(dot(-uv, n), 1.0);
+  cVec3  r_out_perp     = etai_over_etat * (uv + cos_theta * n);
+  cVec3  r_out_parallel = -std::sqrt(std::fabs(1.0 - r_out_perp.length_squared())) * n;
+  return r_out_perp + r_out_parallel;
+}
+
 #endif

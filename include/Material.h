@@ -51,4 +51,24 @@ private:
   num_t _fuzz;
 };
 
+class Dielectric : public Material {
+public:
+  Dielectric(cnum_t ri) : _ri{ri} {}
+
+  bool
+  scatter(cRay &r_in, const HitRecord &rec, Color &attenuation, Ray &scattered) const override {
+    attenuation = Color(1.0, 1.0, 1.0);
+    cnum_t ri   = rec.front_face ? (1.0 / _ri) : _ri; // 1.0 is ri of air
+
+    cVec3 unit_direction = unit_vector(r_in.direction());
+    cVec3 refracted      = refract(unit_direction, rec.N, ri);
+
+    scattered = Ray{rec.p, refracted};
+    return true;
+  }
+
+private:
+  num_t _ri; // refractive index
+};
+
 #endif
