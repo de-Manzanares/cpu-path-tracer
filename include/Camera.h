@@ -10,10 +10,14 @@
 #include <iostream>
 
 struct CameraConfig {
-  num_t aspect_ratio;
-  int   image_width;
-  int   samples_per_pixel;
-  int   max_depth;
+  num_t  aspect_ratio;
+  int    image_width;
+  int    samples_per_pixel;
+  int    max_depth;
+  num_t  vfov;
+  Point3 look_from;
+  Point3 look_at;
+  Vec3   vup;
 };
 
 class Camera {
@@ -27,21 +31,32 @@ public:
     _samples_per_pixel  = config.samples_per_pixel;
     _pixel_sample_scale = 1.0 / _samples_per_pixel;
     _max_depth          = config.max_depth;
+    _vfov               = config.vfov;
+    _camera_center      = config.look_from;
+    _look_at            = config.look_at;
+    _vup                = config.vup;
 
     _image_height =
         _image_width / _aspect_ratio < 1 ? 1 : static_cast<int>(_image_width / _aspect_ratio);
 
-    // camera
+    // viewport dimensions
 
-    _camera_center                  = Point3{0, 0, 1};
-    constexpr num_t focal_length    = 1.0;
-    constexpr num_t viewport_height = 2.0;
-    cnum_t viewport_width = viewport_height * (static_cast<num_t>(_image_width) / _image_height);
+    cnum_t focal_length    = (_look_at - _camera_center).length();
+    cnum_t theta           = degrees_to_radians(_vfov);
+    cnum_t h               = std::tan(theta / 2);
+    cnum_t viewport_height = 2 * h * focal_length;
+    cnum_t viewport_width  = viewport_height * (static_cast<num_t>(_image_width) / _image_height);
+
+    // unit basis vectors for camera plane
+
+    _w = unit_vector(_camera_center - _look_at);
+    _u = unit_vector(cross(_vup, _w));
+    _v = cross(_w, _u);
 
     // horizontal and vertical viewport edges
 
-    const auto viewport_u = Vec3{viewport_width, 0, 0};
-    const auto viewport_v = Vec3{0, -viewport_height, 0};
+    cVec3 viewport_u = viewport_width * _u;
+    cVec3 viewport_v = -viewport_height * _v;
 
     // pixel deltas
 
@@ -50,8 +65,8 @@ public:
 
     // location of upper left pixel
 
-    const auto viewport_upper_left =
-        _camera_center - Vec3{0, 0, focal_length} - viewport_u / 2 - viewport_v / 2;
+    cVec3 viewport_upper_left =
+        _camera_center - (focal_length * _w) - (viewport_u / 2) - (viewport_v / 2);
     _pixel00_loc = viewport_upper_left + 0.5 * (_pixel_delta_u + _pixel_delta_v);
   }
 
@@ -87,8 +102,14 @@ private:
   int    _image_height;       // Rendered image height
   int    _samples_per_pixel;  // Count of random samples for each pixel
   int    _max_depth;          // Limit the number of reflections per ray
-  num_t  _pixel_sample_scale; // Color scale factor for a sum of pixel samples
+  num_t  _vfov;               // Veritcal fov
   Point3 _camera_center;      // Camera center
+  Point3 _look_at;            // Look toward here
+  Vec3   _vup;                // Defines "up"
+  Vec3   _u;                  // camera view unit basis vector right
+  Vec3   _v;                  // camera view unit basis vector up
+  Vec3   _w;                  // camera view unit basis vector view direction
+  num_t  _pixel_sample_scale; // Color scale factor for a sum of pixel samples
   Point3 _pixel00_loc;        // Location of pixel 0, 0
   Vec3   _pixel_delta_u;      // Offset to pixel to the right
   Vec3   _pixel_delta_v;      // Offset to pixel below

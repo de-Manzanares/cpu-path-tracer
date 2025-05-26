@@ -53,9 +53,13 @@ int main() {
 
   CameraConfig config = {
       .aspect_ratio      = 16.0 / 9.0,
-      .image_width       = resolutions["HD"],
+      .image_width       = resolutions["qHD"],
       .samples_per_pixel = 100,
       .max_depth         = 50,
+      .vfov              = 15,
+      .look_from         = Point3{-4, 4, 2 },
+      .look_at           = Point3{0,  0, -1},
+      .vup               = Vec3{0,  1, 0 },
   };
 
   Camera cam(config);
