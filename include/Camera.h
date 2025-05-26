@@ -73,9 +73,9 @@ public:
   void render(cHittableList &world) const {
     std::cout << "P3\n" << _image_width << " " << _image_height << "\n255\n";
     for (int j = 0; j < _image_height; j++) {
+      std::clog << "\rScanlines remaining: " << (_image_height - j) << std::flush;
       if ((_image_height - j) % 100 == 0) {
         std::clog << "\r                                            " << std::flush;
-        std::clog << "\rScanlines remaining: " << (_image_height - j) << std::flush;
       }
       for (int i = 0; i < _image_width; i++) {
         if (_samples_per_pixel == 1) {
